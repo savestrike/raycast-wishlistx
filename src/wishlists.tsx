@@ -1,6 +1,6 @@
-import { List, ActionPanel, Action, confirmAlert, useNavigation, Alert } from "@raycast/api";
+import { List, ActionPanel, Action, confirmAlert, useNavigation, Alert, Icon } from "@raycast/api";
 import { useCachedPromise } from "@raycast/utils";
-import { getWishlists, deleteWishlist } from "./utils/api";
+import { getWishlists, deleteWishlist, shareWishlist } from "./utils/api";
 import SavedItems from "./saved-items";
 
 export default function Command() {
@@ -41,7 +41,14 @@ export default function Command() {
                 }}
               />
               <Action
+                title="Share Wishlist"
+                icon={Icon.Link}
+                shortcut={{ modifiers: ["cmd"], key: "s" }}
+                onAction={() => shareWishlist(wishlist.id, wishlist.name)}
+              />
+              <Action
                 title="Delete Wishlist"
+                icon={Icon.Trash}
                 style={Action.Style.Destructive}
                 shortcut={{ modifiers: ["cmd", "shift"], key: "d" }}
                 onAction={() => handleDelete(wishlist.id, wishlist.name)}

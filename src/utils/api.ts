@@ -1,7 +1,7 @@
 import fetch, { FormData } from "node-fetch";
 import { getToken, signIn } from "./auth";
 import { API_BASE_URL } from "./constants";
-import { showToast, Toast } from "@raycast/api";
+import { showToast, Toast, Clipboard } from "@raycast/api";
 
 // Define the API response type
 export type WishlistResponse = {
@@ -365,5 +365,64 @@ export async function createWishlist(name: string): Promise<boolean> {
       message: String(error)
     });
     return false;
+  }
+}
+
+type ShareResponse = {
+  success: boolean;
+  share: {
+    share_url: string;
+  };
+}
+
+export async function shareWishlist(wishlistId: number, wishlistName: string): Promise<string> {
+  const token = await getToken();
+  if (!token && !(await handleAuthError())) throw new Error("Authentication failed");
+
+  try {
+    await showToast({
+      style: Toast.Style.Animated,
+      title: `Creating share link for "${wishlistName}"...`
+    });
+
+    const formData = new FormData();
+    formData.append("wishlist_id", wishlistId.toString());
+
+    const response = await fetch(`${API_BASE_URL}/shares`, {
+      method: "POST",
+      headers: {
+        "Authorization": `Bearer ${token}`,
+        "x-api-version": "1.1",
+      },
+      body: formData,
+    });
+
+    if (response.status === 401 || response.status === 403) {
+      if (await handleAuthError()) {
+        return shareWishlist(wishlistId, wishlistName);
+      }
+      throw new Error("Authentication failed");
+    }
+
+    if (!response.ok) {
+      throw new Error("Failed to create share link");
+    }
+
+    const data = await response.json() as ShareResponse;
+    await Clipboard.copy(data.share.share_url);
+
+    await showToast({
+      style: Toast.Style.Success,
+      title: "Share link copied to clipboard"
+    });
+
+    return data.share.share_url;
+  } catch (error) {
+    await showToast({
+      style: Toast.Style.Failure,
+      title: "Failed to create share link",
+      message: String(error)
+    });
+    throw error;
   }
 }
