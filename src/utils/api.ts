@@ -279,3 +279,91 @@ export async function deleteFavorite(favoriteId: number): Promise<boolean> {
     return false;
   }
 }
+
+export async function deleteWishlist(wishlistId: number, deleteItems: boolean): Promise<boolean> {
+  const token = await getToken();
+  if (!token && !(await handleAuthError())) return false;
+
+  try {
+    const response = await fetch(`${API_BASE_URL}/wishlists/${wishlistId}?delete_favorites=${deleteItems}`, {
+      method: "DELETE",
+      headers: {
+        "Authorization": `Bearer ${token}`,
+        "x-api-version": "1.1",
+      },
+    });
+
+    if (response.status === 401 || response.status === 403) {
+      return (await handleAuthError()) ? deleteWishlist(wishlistId, deleteItems) : false;
+    }
+
+    if (!response.ok) {
+      await showToast({
+        style: Toast.Style.Failure,
+        title: "Failed to delete wishlist",
+        message: "Please try again"
+      });
+      return false;
+    }
+
+    await showToast({
+      style: Toast.Style.Success,
+      title: "Wishlist deleted"
+    });
+
+    return true;
+  } catch (error) {
+    await showToast({
+      style: Toast.Style.Failure,
+      title: "Failed to delete wishlist",
+      message: String(error)
+    });
+    return false;
+  }
+}
+
+export async function createWishlist(name: string): Promise<boolean> {
+  const token = await getToken();
+  if (!token && !(await handleAuthError())) return false;
+
+  try {
+    const formData = new FormData();
+    formData.append("wishlist[name]", name);
+
+    const response = await fetch(`${API_BASE_URL}/wishlists`, {
+      method: "POST",
+      headers: {
+        "Authorization": `Bearer ${token}`,
+        "x-api-version": "1.1",
+      },
+      body: formData,
+    });
+
+    if (response.status === 401 || response.status === 403) {
+      return (await handleAuthError()) ? createWishlist(name) : false;
+    }
+
+    if (!response.ok) {
+      await showToast({
+        style: Toast.Style.Failure,
+        title: "Failed to create wishlist",
+        message: "Please try again"
+      });
+      return false;
+    }
+
+    await showToast({
+      style: Toast.Style.Success,
+      title: "Wishlist created"
+    });
+
+    return true;
+  } catch (error) {
+    await showToast({
+      style: Toast.Style.Failure,
+      title: "Failed to create wishlist",
+      message: String(error)
+    });
+    return false;
+  }
+}

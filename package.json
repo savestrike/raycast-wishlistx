@@ -33,6 +33,28 @@
           "placeholder": "https://wishlistx.de/product"
         }
       ]
+    },
+    {
+      "name": "wishlists",
+      "title": "Wishlists",
+      "subtitle": "View all wishlists",
+      "description": "View and manage your wishlists",
+      "mode": "view"
+    },
+    {
+      "name": "create-wishlist",
+      "title": "Create Wishlist",
+      "subtitle": "Create a new wishlist",
+      "description": "Create a new wishlist with a name",
+      "mode": "no-view",
+      "arguments": [
+        {
+          "type": "text",
+          "name": "name",
+          "placeholder": "Wishlist name",
+          "required": true
+        }
+      ]
     }
   ],
   "dependencies": {

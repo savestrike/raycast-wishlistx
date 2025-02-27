@@ -1,11 +1,15 @@
 import { useState } from "react";
-import { ActionPanel, Action, Grid } from "@raycast/api";
+import { Grid } from "@raycast/api";
 import { useCachedPromise } from "@raycast/utils";
 import { getSavedItems, getWishlists, type SavedItem } from "./utils/api";
-import { WishlistActions } from "./components/WishlistActions";
+import { SavedItemsGrid } from "./components/SavedItemsGrid";
 
-export default function Command() {
-  const [selectedWishlistId, setSelectedWishlistId] = useState<number | undefined>();
+interface SavedItemsProps {
+  initialWishlistId?: number;
+}
+
+export default function Command({ initialWishlistId }: SavedItemsProps) {
+  const [selectedWishlistId, setSelectedWishlistId] = useState<number | undefined>(initialWishlistId);
   const [localItems, setLocalItems] = useState<SavedItem[]>([]);
 
   const { data: wishlists = [], revalidate: revalidateWishlists } = useCachedPromise(getWishlists, []);
@@ -70,14 +74,17 @@ export default function Command() {
     });
 
   return (
-    <Grid
-      columns={4}
-      inset={Grid.Inset.Zero}
+    <SavedItemsGrid
+      items={items}
+      wishlists={wishlists}
       isLoading={isLoading}
+      currentWishlistId={selectedWishlistId}
+      onUpdate={handleUpdate}
       searchBarAccessory={
         <Grid.Dropdown
           tooltip="Select Wishlist"
-          storeValue={true}
+          storeValue={false}
+          value={selectedWishlistId?.toString() || ""}
           onChange={(newValue) => setSelectedWishlistId(newValue ? parseInt(newValue) : undefined)}
         >
           <Grid.Dropdown.Item title="All Items" value="" />
@@ -90,27 +97,6 @@ export default function Command() {
           ))}
         </Grid.Dropdown>
       }
-    >
-      {items.map((item: SavedItem) => (
-        <Grid.Item
-          key={item.id}
-          content={item.image?.url ? { source: item.image.url } : { source: "placeholder.png"}}
-          title={item.name}
-          subtitle={`${parseFloat(item.target_amount).toLocaleString()} €`}
-          actions={
-            <ActionPanel>
-              <Action.OpenInBrowser url={item.tracking_url || item.url} />
-              <Action.CopyToClipboard content={item.url} />
-              <WishlistActions
-                item={item}
-                wishlists={wishlists}
-                currentWishlistId={selectedWishlistId}
-                onUpdate={(targetWishlistId) => handleUpdate(item.id, targetWishlistId)}
-              />
-            </ActionPanel>
-          }
-        />
-      ))}
-    </Grid>
+    />
   );
 }
