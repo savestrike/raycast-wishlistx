@@ -18,7 +18,7 @@ export function SavedItemsGrid({
   currentWishlistId,
   onUpdate,
   searchBarAccessory
-}: SavedItemsGridProps) {
+}: Readonly<SavedItemsGridProps>) {
   return (
     <Grid
       columns={4}

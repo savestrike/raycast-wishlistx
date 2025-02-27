@@ -1,7 +1,6 @@
-import { List, ActionPanel, Action, confirmAlert, Alert } from "@raycast/api";
+import { List, ActionPanel, Action, confirmAlert, useNavigation, Alert } from "@raycast/api";
 import { useCachedPromise } from "@raycast/utils";
 import { getWishlists, deleteWishlist } from "./utils/api";
-import { useNavigation } from "@raycast/api";
 import SavedItems from "./saved-items";
 
 export default function Command() {

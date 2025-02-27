@@ -1,6 +1,5 @@
-import { showToast, Toast, LaunchProps } from "@raycast/api";
+import { AI, showToast, Toast, LaunchProps } from "@raycast/api";
 import { addItem } from "./utils/api";
-import { AI } from "@raycast/api";
 
 interface ProductInfo {
   name: string;

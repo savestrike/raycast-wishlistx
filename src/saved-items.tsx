@@ -8,7 +8,7 @@ interface SavedItemsProps {
   initialWishlistId?: number;
 }
 
-export default function Command({ initialWishlistId }: SavedItemsProps) {
+export default function Command({ initialWishlistId }: Readonly<SavedItemsProps>) {
   const [selectedWishlistId, setSelectedWishlistId] = useState<number | undefined>(initialWishlistId);
   const [localItems, setLocalItems] = useState<SavedItem[]>([]);
 
@@ -84,7 +84,7 @@ export default function Command({ initialWishlistId }: SavedItemsProps) {
         <Grid.Dropdown
           tooltip="Select Wishlist"
           storeValue={false}
-          value={selectedWishlistId?.toString() || ""}
+          value={selectedWishlistId?.toString() ?? ""}
           onChange={(newValue) => setSelectedWishlistId(newValue ? parseInt(newValue) : undefined)}
         >
           <Grid.Dropdown.Item title="All Items" value="" />

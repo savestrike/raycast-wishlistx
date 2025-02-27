@@ -1,7 +1,7 @@
 import { LaunchProps, showToast, Toast } from "@raycast/api";
 import { createWishlist } from "./utils/api";
 
-export default async function Command(props: LaunchProps<{ arguments: { name: string } }>) {
+export default async function Command(props: Readonly<LaunchProps<{ arguments: { name: string } }>>) {
   const { name } = props.arguments;
 
   try {
