@@ -14,6 +14,20 @@
   "license": "MIT",
   "commands": [
     {
+      "name": "login",
+      "title": "Sign In",
+      "subtitle": "Sign in to your account",
+      "description": "Sign in to WishlistX",
+      "mode": "view"
+    },
+    {
+      "name": "onboarding",
+      "title": "Sign Up",
+      "subtitle": "Create a new account",
+      "description": "Sign up for WishlistX",
+      "mode": "view"
+    },
+    {
       "name": "saved-items",
       "title": "Saved items",
       "subtitle": "View all items",
@@ -55,6 +69,13 @@
           "required": true
         }
       ]
+    },
+    {
+      "name": "logout",
+      "title": "Sign Out",
+      "subtitle": "Sign out of your account",
+      "description": "Sign out of WishlistX",
+      "mode": "no-view"
     }
   ],
   "dependencies": {
@@ -77,22 +98,5 @@
     "lint": "ray lint",
     "prepublishOnly": "echo \"\\n\\nIt seems like you are trying to publish the Raycast extension to npm.\\n\\nIf you did intend to publish it to npm, remove the \\`prepublishOnly\\` script and rerun \\`npm publish\\` again.\\nIf you wanted to publish it to the Raycast Store instead, use \\`npm run publish\\` instead.\\n\\n\" && exit 1",
     "publish": "npx @raycast/api@latest publish"
-  },
-  "preferences": [
-    {
-      "name": "phone",
-      "type": "textfield",
-      "required": true,
-      "title": "Phone Number",
-      "description": "Your phone number (e.g. +491234567890)",
-      "placeholder": "+491234567890"
-    },
-    {
-      "name": "password",
-      "type": "password",
-      "required": true,
-      "title": "Password",
-      "description": "Your password"
-    }
-  ]
+  }
 }

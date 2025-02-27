@@ -1,7 +1,7 @@
 import fetch, { FormData } from "node-fetch";
-import { getToken, signIn } from "./auth";
+import { getToken, setToken } from "./auth";
 import { API_BASE_URL } from "./constants";
-import { showToast, Toast, Clipboard } from "@raycast/api";
+import { showToast, Toast, Clipboard, popToRoot } from "@raycast/api";
 
 // Define the API response type
 export type WishlistResponse = {
@@ -40,15 +40,12 @@ export type SavedItem = {
 };
 
 async function handleAuthError(): Promise<boolean> {
-  const success = await signIn();
-  if (!success) {
-    await showToast({
-      style: Toast.Style.Failure,
-      title: "Authentication failed",
-      message: "Please check your credentials in preferences"
-    });
-  }
-  return success;
+  await showToast({
+    style: Toast.Style.Failure,
+    title: "Not signed in",
+    message: "Use the Sign In or Sign Up command"
+  });
+  return false;
 }
 
 interface AddItemData {
@@ -424,5 +421,91 @@ export async function shareWishlist(wishlistId: number, wishlistName: string): P
       message: String(error)
     });
     throw error;
+  }
+}
+
+interface SignupData {
+  email: string;
+  first_name: string;
+  last_name: string;
+  password: string;
+  password_confirmation: string;
+  phone: string;
+}
+
+export async function signup(data: SignupData): Promise<boolean> {
+  try {
+    const formData = new FormData();
+    formData.append("email", data.email);
+    formData.append("first_name", data.first_name);
+    formData.append("last_name", data.last_name);
+    formData.append("password", data.password);
+    formData.append("password_confirmation", data.password_confirmation);
+    formData.append("phone", data.phone);
+
+    const response = await fetch(`${API_BASE_URL}/auth`, {
+      method: "POST",
+      headers: {
+        "x-api-version": "1.1",
+      },
+      body: formData,
+    });
+
+    if (!response.ok) {
+      throw new Error("Failed to sign up");
+    }
+
+    await showToast({
+      style: Toast.Style.Success,
+      title: "Verification code sent",
+      message: "Please check your phone"
+    });
+
+    return true;
+  } catch (error) {
+    await showToast({
+      style: Toast.Style.Failure,
+      title: "Failed to sign up",
+      message: String(error)
+    });
+    return false;
+  }
+}
+
+export async function confirmSignup(phone: string, code: string): Promise<boolean> {
+  try {
+    const formData = new FormData();
+    formData.append("phone", phone);
+    formData.append("confirmation_token", code);
+
+    const response = await fetch(`${API_BASE_URL}/auth/confirmation?confirmation_token=${code}`, {
+      method: "GET",
+    });
+
+    if (!response.ok) {
+      throw new Error("Invalid verification code");
+    }
+
+    const authToken = response.headers.get("Authorization");
+    if (authToken) {
+      await setToken(authToken);
+    }
+
+    await showToast({
+      style: Toast.Style.Success,
+      title: "Account verified",
+      message: "You are now signed in"
+    });
+
+    popToRoot();
+
+    return true;
+  } catch (error) {
+    await showToast({
+      style: Toast.Style.Failure,
+      title: "Failed to verify account",
+      message: String(error)
+    });
+    return false;
   }
 }
